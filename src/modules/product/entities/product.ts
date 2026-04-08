@@ -1,5 +1,6 @@
 export interface IProduct {
 	id?: string | number;
+	listId: string;
 	category: string;
 	name: string;
 	quantity: number;

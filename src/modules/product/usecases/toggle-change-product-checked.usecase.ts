@@ -8,13 +8,16 @@ export class ToggleChangeProductCheckedUseCase implements IUseCase {
 		private cacheProvider: ICacheProvider,
 	) {}
 
-	async execute(data: { id: string | number; checked: boolean }) {
-		const { id, checked } = data;
+	async execute(data: { id: string; listId: string; checked: boolean }) {
+		const { id, listId, checked } = data;
 		const updated = await this.productRepository.toggleProductChecked(
 			id,
+			listId,
 			checked,
 		);
-		await this.cacheProvider.invalidateByPattern("products:page:*");
+		await this.cacheProvider.invalidateByPattern(
+			`products:page:*:list:${listId}`,
+		);
 		return updated;
 	}
 }

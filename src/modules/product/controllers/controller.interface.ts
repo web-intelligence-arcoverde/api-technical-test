@@ -1,9 +1,5 @@
-import type { NextFunction, Request, Response } from "express";
+import type { RequestHandler } from "express";
 
 export interface IController {
-	handle: (
-		req: Request,
-		res: Response,
-		next: NextFunction,
-	) => Promise<Response | undefined>;
+	handle: RequestHandler;
 }

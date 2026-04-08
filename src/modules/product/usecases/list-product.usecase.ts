@@ -8,10 +8,10 @@ export class ListProductsUseCase implements IUseCase {
 		private cacheProvider: ICacheProvider,
 	) {}
 
-	async execute(data: { page?: number; limit?: number }) {
-		const { page = 1, limit = 10 } = data;
+	async execute(data: { page?: number; limit?: number; listId: string }) {
+		const { page = 1, limit = 10, listId } = data;
 
-		const cacheKey = `products:page:${page}:limit:${limit}`;
+		const cacheKey = `products:page:${page}:limit:${limit}:list:${listId}`;
 
 		const cached = await this.cacheProvider.get(cacheKey);
 		if (cached) {
@@ -21,6 +21,7 @@ export class ListProductsUseCase implements IUseCase {
 		const products = await this.productRepository.findAll(
 			Number(page),
 			Number(limit),
+			listId,
 		);
 
 		await this.cacheProvider.set(cacheKey, products, 60 * 5); // 5 minutos

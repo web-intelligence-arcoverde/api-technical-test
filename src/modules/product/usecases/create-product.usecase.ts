@@ -6,8 +6,8 @@ import type { IUseCase } from "./usecase.interface";
 export class CreateProductUseCase implements IUseCase {
 	constructor(private readonly productRepository: ProductRepository) {}
 	async execute(data: IProduct) {
-		const user = await this.productRepository.create(data);
-		await invalidateCacheByPattern("products:page:*");
-		return user;
+		const product = await this.productRepository.create(data);
+		await invalidateCacheByPattern(`products:page:*:list:${data.listId}`);
+		return product;
 	}
 }

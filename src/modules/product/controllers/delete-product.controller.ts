@@ -1,4 +1,4 @@
-import type { NextFunction, Request, Response } from "express";
+import type { RequestHandler } from "express";
 import { z } from "zod";
 import type { IUseCase } from "../usecases/usecase.interface";
 import { deleteProductValidation } from "../validations/delete-product.schema";
@@ -7,29 +7,22 @@ import type { IController } from "./controller.interface";
 export class DeleteProductController implements IController {
 	constructor(private readonly useCase: IUseCase) {}
 
-	async handle(
-		req: Request,
-		res: Response,
-		next: NextFunction,
-	): Promise<Response> {
+	handle: RequestHandler = async (req, res, next) => {
 		try {
 			const validated = deleteProductValidation.parse({
 				id: req.params.id,
+				listId: req.query.listId,
 			});
 
 			const result = await this.useCase.execute(validated);
 
-			return res
-				.status(200)
-				.json({ message: "Deleted Product successfully", result });
+			res.status(200).json({ message: "Deleted Product successfully", result });
 		} catch (err) {
 			if (err instanceof z.ZodError) {
-				return res
-					.status(400)
-					.json({ error: "Invalid input", issues: err.issues });
+				res.status(400).json({ error: "Invalid input", issues: err.issues });
+				return;
 			}
 			next(err);
-			return res.status(500).json({ error: "Internal server error" });
 		}
-	}
+	};
 }

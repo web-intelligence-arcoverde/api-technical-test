@@ -8,10 +8,12 @@ export class DeleteProductUseCase implements IUseCase {
 		private cacheProvider: ICacheProvider,
 	) {}
 
-	async execute(data: { id: string | number }) {
-		const { id } = data;
-		const deletedProduct = await this.productRepository.delete(id);
-		await this.cacheProvider.invalidateByPattern("products:page:*");
-		return deletedProduct;
+	async execute(data: { id: string; listId: string }) {
+		const { id, listId } = data;
+		const result = await this.productRepository.delete(id, listId);
+		await this.cacheProvider.invalidateByPattern(
+			`products:page:*:list:${listId}`,
+		);
+		return result;
 	}
 }
