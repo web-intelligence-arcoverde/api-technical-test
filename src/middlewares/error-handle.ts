@@ -1,3 +1,4 @@
+import { isAxiosError } from "axios";
 import type { NextFunction, Request, Response } from "express";
 import { ZodError } from "zod";
 
@@ -21,10 +22,9 @@ const errorHandler = (
 	console.error("Error details:", err);
 
 	// 0. Axios / Identity Toolkit REST API Errors
-	const axiosError = err as any;
-	if (axiosError.isAxiosError && axiosError.response?.data?.error) {
-		const { message, code } = axiosError.response.data.error;
-		let status = axiosError.response.status || 400;
+	if (isAxiosError(err) && err.response?.data?.error) {
+		const { message } = err.response.data.error;
+		let status = err.response.status || 400;
 
 		// Map common Identity Toolkit messages to standard status codes
 		if (message === "EMAIL_NOT_FOUND" || message === "INVALID_PASSWORD") {
