@@ -1,180 +1,180 @@
 {
-  "openapi": "3.0.0",
-  "info": {
-    "title": "API de Lista de Produtos",
-    "version": "1.0.0",
-    "description": "Documentação da API para gerenciar uma lista de produtos."
-  },
-  "servers": [
-    {
-      "url": "http://localhost:3000",
-      "description": "Servidor local"
-    }
-  ],
-  "paths": {
-    "/product": {
-      "get": {
-        "summary": "Listar produtos",
-        "description": "Retorna uma lista de produtos com paginação.",
-        "parameters": [
-          {
-            "name": "page",
-            "in": "query",
-            "description": "Número da página",
-            "required": false,
-            "schema": {
-              "type": "integer",
-              "default": 1
-            }
-          },
-          {
-            "name": "limit",
-            "in": "query",
-            "description": "Quantidade de itens por página",
-            "required": false,
-            "schema": {
-              "type": "integer",
-              "default": 10
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Lista de produtos retornada com sucesso.",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "page": { "type": "integer" },
-                    "limit": { "type": "integer" },
-                    "data": {
-                      "type": "array",
-                      "items": {
-                        "type": "object",
-                        "properties": {
-                          "id": { "type": "integer" },
-                          "category": { "type": "string" },
-                          "name": { "type": "string" },
-                          "quantity": { "type": "integer" },
-                          "unit": { "type": "string" },
-                          "checked": { "type": "boolean" }
-                        }
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          }
-        }
-      },
-      "post": {
-        "summary": "Criar produto",
-        "description": "Cria um novo produto.",
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "category": { "type": "string" },
-                  "name": { "type": "string" },
-                  "quantity": { "type": "integer" },
-                  "unit": { "type": "string" },
-                  "checked": { "type": "boolean" }
-                },
-                "required": ["category", "name", "quantity", "unit"]
-              }
-            }
-          }
-        },
-        "responses": {
-          "201": {
-            "description": "Produto criado com sucesso."
-          }
-        }
-      }
-    },
-    "/product/{id}/checked": {
-      "patch": {
-        "summary": "Atualizar o campo 'checked' de um produto",
-        "description": "Atualiza o campo 'checked' de um produto específico.",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "description": "ID do produto",
-            "required": true,
-            "schema": {
-              "type": "integer"
-            }
-          }
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "checked": { "type": "boolean" }
-                },
-                "required": ["checked"]
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "Produto atualizado com sucesso."
-          },
-          "404": {
-            "description": "Produto não encontrado."
-          }
-        }
-      }
-    },
-    "/product/{id}": {
-      "delete": {
-        "summary": "Excluir produto",
-        "description": "Exclui um produto específico pelo ID.",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "description": "ID do produto a ser excluído",
-            "required": true,
-            "schema": {
-              "type": "integer"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Produto excluído com sucesso.",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "id": { "type": "integer" },
-                    "category": { "type": "string" },
-                    "name": { "type": "string" },
-                    "quantity": { "type": "integer" },
-                    "unit": { "type": "string" },
-                    "checked": { "type": "boolean" }
-                  }
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "Produto não encontrado."
-          }
-        }
-      }
-    }
-  }
+	"openapi": "3.0.0",
+	"info": {
+		"title": "API de Lista de Produtos",
+		"version": "1.0.0",
+		"description": "Documentação da API para gerenciar uma lista de produtos."
+	},
+	"servers": [
+		{
+			"url": "http://localhost:3000",
+			"description": "Servidor local"
+		}
+	],
+	"paths": {
+		"/product": {
+			"get": {
+				"summary": "Listar produtos",
+				"description": "Retorna uma lista de produtos com paginação.",
+				"parameters": [
+					{
+						"name": "page",
+						"in": "query",
+						"description": "Número da página",
+						"required": false,
+						"schema": {
+							"type": "integer",
+							"default": 1
+						}
+					},
+					{
+						"name": "limit",
+						"in": "query",
+						"description": "Quantidade de itens por página",
+						"required": false,
+						"schema": {
+							"type": "integer",
+							"default": 10
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "Lista de produtos retornada com sucesso.",
+						"content": {
+							"application/json": {
+								"schema": {
+									"type": "object",
+									"properties": {
+										"page": { "type": "integer" },
+										"limit": { "type": "integer" },
+										"data": {
+											"type": "array",
+											"items": {
+												"type": "object",
+												"properties": {
+													"id": { "type": "integer" },
+													"category": { "type": "string" },
+													"name": { "type": "string" },
+													"quantity": { "type": "integer" },
+													"unit": { "type": "string" },
+													"checked": { "type": "boolean" }
+												}
+											}
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			},
+			"post": {
+				"summary": "Criar produto",
+				"description": "Cria um novo produto.",
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"type": "object",
+								"properties": {
+									"category": { "type": "string" },
+									"name": { "type": "string" },
+									"quantity": { "type": "integer" },
+									"unit": { "type": "string" },
+									"checked": { "type": "boolean" }
+								},
+								"required": ["category", "name", "quantity", "unit"]
+							}
+						}
+					}
+				},
+				"responses": {
+					"201": {
+						"description": "Produto criado com sucesso."
+					}
+				}
+			}
+		},
+		"/product/{id}/checked": {
+			"patch": {
+				"summary": "Atualizar o campo 'checked' de um produto",
+				"description": "Atualiza o campo 'checked' de um produto específico.",
+				"parameters": [
+					{
+						"name": "id",
+						"in": "path",
+						"description": "ID do produto",
+						"required": true,
+						"schema": {
+							"type": "integer"
+						}
+					}
+				],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"type": "object",
+								"properties": {
+									"checked": { "type": "boolean" }
+								},
+								"required": ["checked"]
+							}
+						}
+					}
+				},
+				"responses": {
+					"200": {
+						"description": "Produto atualizado com sucesso."
+					},
+					"404": {
+						"description": "Produto não encontrado."
+					}
+				}
+			}
+		},
+		"/product/{id}": {
+			"delete": {
+				"summary": "Excluir produto",
+				"description": "Exclui um produto específico pelo ID.",
+				"parameters": [
+					{
+						"name": "id",
+						"in": "path",
+						"description": "ID do produto a ser excluído",
+						"required": true,
+						"schema": {
+							"type": "integer"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "Produto excluído com sucesso.",
+						"content": {
+							"application/json": {
+								"schema": {
+									"type": "object",
+									"properties": {
+										"id": { "type": "integer" },
+										"category": { "type": "string" },
+										"name": { "type": "string" },
+										"quantity": { "type": "integer" },
+										"unit": { "type": "string" },
+										"checked": { "type": "boolean" }
+									}
+								}
+							}
+						}
+					},
+					"404": {
+						"description": "Produto não encontrado."
+					}
+				}
+			}
+		}
+	}
 }

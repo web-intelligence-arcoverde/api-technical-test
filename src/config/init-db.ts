@@ -1,7 +1,7 @@
-import database from './database';
+import database from "./database";
 
 export async function initDB() {
-  const createProductTableQuery = `
+	const createProductTableQuery = `
     CREATE TABLE IF NOT EXISTS products (
       id SERIAL PRIMARY KEY,
       category VARCHAR(100) NOT NULL,
@@ -14,11 +14,11 @@ export async function initDB() {
     );
   `;
 
-  try {
-    await database.query(createProductTableQuery);
-    console.log('✅ Tabela "products" verificada/criada com sucesso.');
-  } catch (error) {
-    console.error('❌ Erro ao criar a tabela products:', error);
-    process.exit(1);
-  }
+	try {
+		await database.query(createProductTableQuery);
+		console.log('✅ Tabela "products" verificada/criada com sucesso.');
+	} catch (error) {
+		console.error("❌ Erro ao criar a tabela products:", error);
+		process.exit(1);
+	}
 }

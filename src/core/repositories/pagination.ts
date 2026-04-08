@@ -1,6 +1,6 @@
 export interface IPagination {
-    data:any[]
-    total:number;
-    totalPages:number;
-    currentPage:number
-  }
+	data: any[];
+	total: number;
+	totalPages: number;
+	currentPage: number;
+}

@@ -1,7 +1,7 @@
 export interface Product {
-  category: string;
-  name: string;
-  quantity: number;
-  unit: string;
-  checked: boolean;
+	category: string;
+	name: string;
+	quantity: number;
+	unit: string;
+	checked: boolean;
 }

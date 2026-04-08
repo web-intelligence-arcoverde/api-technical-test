@@ -1,5 +1,5 @@
-import { IProduct } from "../interfaces/product";
+import type { IProduct } from "../interfaces/product";
 
 export class Product {
-    constructor(readonly product:IProduct) {}
-  }
+	constructor(readonly product: IProduct) {}
+}

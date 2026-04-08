@@ -1,5 +1,5 @@
-import { z } from 'zod';
+import { z } from "zod";
 
 export const deleteProductValidation = z.object({
-  id: z.string().regex(/^\d+$/).transform(Number),
+	id: z.string().regex(/^\d+$/).transform(Number),
 });
