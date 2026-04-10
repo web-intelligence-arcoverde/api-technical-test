@@ -1,4 +1,4 @@
-import type { Request, Response, NextFunction } from "express";
+import type { NextFunction, Request, Response } from "express";
 import { auth } from "../infra/firestore";
 
 export const authMiddleware = async (
@@ -8,7 +8,7 @@ export const authMiddleware = async (
 ) => {
 	const authHeader = req.headers.authorization;
 
-	if (!authHeader || !authHeader.startsWith("Bearer ")) {
+	if (!authHeader?.startsWith("Bearer ")) {
 		res.status(401).json({ error: "No token provided" });
 		return;
 	}
@@ -23,7 +23,7 @@ export const authMiddleware = async (
 			email: decodedToken.email,
 		};
 		next();
-	} catch (error) {
+	} catch (_error) {
 		res.status(401).json({ error: "Invalid or expired token" });
 		return;
 	}

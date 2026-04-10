@@ -163,6 +163,32 @@
 				}
 			}
 		},
+		"/shopping-list/shared/{id}": {
+			"get": {
+				"tags": ["Listas"],
+				"summary": "Obter detalhes de uma lista (Público)",
+				"description": "Endpoint público para visualização de listas compartilhadas. Não requer autenticação.",
+				"parameters": [
+					{
+						"name": "id",
+						"in": "path",
+						"required": true,
+						"schema": { "type": "string" }
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "Sucesso",
+						"content": {
+							"application/json": {
+								"schema": { "$ref": "#/components/schemas/ShoppingList" }
+							}
+						}
+					},
+					"404": { "description": "Lista não encontrada" }
+				}
+			}
+		},
 		"/shopping-list": {
 			"get": {
 				"tags": ["Listas"],
@@ -569,7 +595,15 @@
 					"unit": { "type": "string" },
 					"checked": { "type": "boolean" }
 				},
-				"required": ["listId", "name", "marketName", "price", "category", "quantity", "unit"]
+				"required": [
+					"listId",
+					"name",
+					"marketName",
+					"price",
+					"category",
+					"quantity",
+					"unit"
+				]
 			},
 			"AddProductRequest": {
 				"type": "object",
@@ -582,7 +616,14 @@
 					"unit": { "type": "string" },
 					"checked": { "type": "boolean" }
 				},
-				"required": ["category", "name", "marketName", "price", "quantity", "unit"]
+				"required": [
+					"category",
+					"name",
+					"marketName",
+					"price",
+					"quantity",
+					"unit"
+				]
 			}
 		}
 	}

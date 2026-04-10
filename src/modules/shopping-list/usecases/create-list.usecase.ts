@@ -1,6 +1,10 @@
-import type { IShoppingList } from "../entities/shopping-list";
-import type { IShoppingListRepository } from "../repositories/shopping-list.repository.interface";
+import { db } from "../../../infra/firestore";
+import {
+	SHOPPING_LIST_JOBS,
+	shoppingListQueue,
+} from "../../../infra/queue/shopping-list.queue";
 import type { IProduct } from "../../product/entities/product";
+import type { IShoppingList } from "../entities/shopping-list";
 
 export interface CreateListDTO {
 	title: string;
@@ -14,10 +18,11 @@ export interface CreateListDTO {
 }
 
 export class CreateListUseCase {
-	constructor(private readonly listRepository: IShoppingListRepository) {}
-
 	async execute(data: CreateListDTO): Promise<IShoppingList> {
-		return await this.listRepository.create({
+		const id = db.collection("lists").doc().id;
+
+		const newList: IShoppingList = {
+			id,
 			title: data.title,
 			description: data.description || "",
 			category: data.category,
@@ -27,6 +32,14 @@ export class CreateListUseCase {
 			items: data.items || [],
 			ownerId: data.userId,
 			lastModified: new Date(),
+		};
+
+		// Enfileira a criação
+		await shoppingListQueue.add(SHOPPING_LIST_JOBS.CREATE_LIST, {
+			...data,
+			id,
 		});
+
+		return newList;
 	}
 }

@@ -1,20 +1,6 @@
 version: '3.8'
 
 services:
-  postgres:
-    image: postgres:15
-    container_name: node_boilerplate_postgres
-    environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
-      POSTGRES_DB: shoppingmarketlist
-    ports:
-      - '5433:5432'
-    volumes:
-      - pgdata:/var/lib/postgresql/data
-    networks:
-      - app-network
-
   redis:
     image: redis:7
     container_name: node_boilerplate_redis
@@ -29,10 +15,9 @@ services:
     ports:
       - '3000:3000'
     environment:
-      DATABASE_URL: postgres://postgres:postgres@postgres:5432/node_app
       REDIS_URL: redis://redis:6379
+      FIREBASE_API_KEY: ${FIREBASE_API_KEY}
     depends_on:
-      - postgres
       - redis
     networks:
       - app-network
@@ -41,9 +26,8 @@ services:
       - /app/node_modules
     command: npm run dev
 
-volumes:
-  pgdata:
-
 networks:
   app-network:
     driver: bridge
+
+# Volumes removidos pois Postgres não é mais necessário

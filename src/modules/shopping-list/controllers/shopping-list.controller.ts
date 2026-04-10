@@ -1,14 +1,20 @@
-import type { RequestHandler } from "express";
-import { z } from "zod";
-import type { CreateListUseCase } from "../usecases/create-list.usecase";
-import type { ListListsUseCase } from "../usecases/list-lists.usecase";
-import type { GetListUseCase } from "../usecases/get-list.usecase";
-import type { UpdateListUseCase } from "../usecases/update-list.usecase";
-import type { DeleteListUseCase } from "../usecases/delete-list.usecase";
+import type { Request, RequestHandler } from "express";
 import type { AddProductToListUseCase } from "../usecases/add-product-to-list.usecase";
+import type { CreateListUseCase } from "../usecases/create-list.usecase";
+import type { DeleteListUseCase } from "../usecases/delete-list.usecase";
+import type { GetListUseCase } from "../usecases/get-list.usecase";
+import type { ListListsUseCase } from "../usecases/list-lists.usecase";
+import type { UpdateListUseCase } from "../usecases/update-list.usecase";
+import { addProductSchema } from "../validations/add-product.schema";
 import { createListSchema } from "../validations/create-list.schema";
 import { updateListSchema } from "../validations/update-list.schema";
-import { addProductSchema } from "../validations/add-product.schema";
+
+interface AuthenticatedRequest extends Request {
+	user: {
+		uid: string;
+		email: string;
+	};
+}
 
 export class ShoppingListController {
 	constructor(
@@ -18,14 +24,14 @@ export class ShoppingListController {
 		private readonly updateListUseCase: UpdateListUseCase,
 		private readonly deleteListUseCase: DeleteListUseCase,
 		private readonly addProductToListUseCase: AddProductToListUseCase,
-	) { }
+	) {}
 
 	create: RequestHandler = async (req, res, next) => {
 		try {
 			const data = createListSchema.parse(req.body);
 			const result = await this.createListUseCase.execute({
 				...data,
-				userId: (req as any).user.uid,
+				userId: (req as unknown as AuthenticatedRequest).user.uid,
 			});
 			res.status(201).json(result);
 		} catch (error) {
@@ -35,8 +41,11 @@ export class ShoppingListController {
 
 	list: RequestHandler = async (req, res, next) => {
 		try {
-			const userId = (req as any).user.uid;
-			const result = await this.listListsUseCase.execute(userId);
+			const userId = (req as unknown as AuthenticatedRequest).user.uid;
+			const page = Number(req.query.page) || 1;
+			const limit = Number(req.query.limit) || 10;
+
+			const result = await this.listListsUseCase.execute(userId, page, limit);
 			res.status(200).json(result);
 		} catch (error) {
 			next(error);
@@ -77,11 +86,12 @@ export class ShoppingListController {
 	addProduct: RequestHandler = async (req, res, next) => {
 		try {
 			const { id } = req.params;
-			const userId = (req as any).user.uid;
+			const userId = (req as unknown as AuthenticatedRequest).user.uid;
 			const data = addProductSchema.parse(req.body);
 			const result = await this.addProductToListUseCase.execute(
 				id,
 				userId,
+				// biome-ignore lint/suspicious/noExplicitAny: Product data is validated by schema
 				data as any,
 			);
 			res.status(201).json(result);

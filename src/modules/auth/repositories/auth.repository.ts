@@ -1,5 +1,6 @@
 import axios from "axios";
 import { auth, db, firebaseConfig } from "../../../infra/firestore";
+import logger from "../../../infra/logger/logger";
 import type { IAuthRepository, IAuthUser } from "./auth.repository.interface";
 
 export class AuthRepository implements IAuthRepository {
@@ -97,7 +98,7 @@ export class AuthRepository implements IAuthRepository {
 		// Note: Usually you'd send this link via email.
 		// Firebase Client SDK has sendPasswordResetEmail which does both.
 		// Admin SDK only generates the link. For now we just generate it.
-		console.log(`Password reset link generated for ${email}: ${link}`);
+		logger.info(`Password reset link generated for ${email}: ${link}`);
 	}
 
 	async update(

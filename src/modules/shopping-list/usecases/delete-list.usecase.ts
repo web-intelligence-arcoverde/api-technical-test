@@ -1,3 +1,4 @@
+import { invalidateCacheByPattern } from "../../../infra/cache/redis.helper";
 import type { IShoppingListRepository } from "../repositories/shopping-list.repository.interface";
 
 export class DeleteListUseCase {
@@ -10,5 +11,10 @@ export class DeleteListUseCase {
 		}
 
 		await this.listRepository.delete(id);
+
+		// Invalida a listagem do usuário, detalhes e compartilhamento
+		await invalidateCacheByPattern(`lists:user:${list.ownerId}:*`);
+		await invalidateCacheByPattern(`list:detail:${id}:*`);
+		await invalidateCacheByPattern(`list:shared:${id}`);
 	}
 }

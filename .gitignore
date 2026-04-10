@@ -6,8 +6,10 @@ node_modules/
 
 # Ignorar logs de aplicação
 *.log
+logs/
 
 # Ignorar arquivos de sistema do OS
 .DS_Store
 Thumbs.db
-shopping-list-5758e-firebase-adminsdk-fbsvc-334e1a2a4a.json
+# Ignorar arquivos de credenciais do Firebase (Admin SDK)
+*-firebase-adminsdk-*.json

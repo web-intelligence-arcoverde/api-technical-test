@@ -1,12 +1,13 @@
+import { db } from "../../../infra/firestore";
+import {
+	SHOPPING_LIST_JOBS,
+	shoppingListQueue,
+} from "../../../infra/queue/shopping-list.queue";
 import type { IProduct } from "../../product/entities/product";
-import type { IProductRepository } from "../../product/repositories/product-repository.interface";
 import type { IShoppingListRepository } from "../repositories/shopping-list.repository.interface";
 
 export class AddProductToListUseCase {
-	constructor(
-		private readonly listRepository: IShoppingListRepository,
-		private readonly productRepository: IProductRepository,
-	) {}
+	constructor(private readonly listRepository: IShoppingListRepository) {}
 
 	async execute(
 		listId: string,
@@ -29,15 +30,23 @@ export class AddProductToListUseCase {
 			throw error;
 		}
 
-		const product = await this.productRepository.create({
-			...productData,
-			listId,
-		});
+		// Generate ID for the new product
+		const productId = db
+			.collection("lists")
+			.doc(listId)
+			.collection("items")
+			.doc().id;
 
-		// Update list metadata
-		await this.listRepository.update(listId, {
-			totalItems: (list.totalItems || 0) + 1,
-			lastModified: new Date(),
+		const product: IProduct = {
+			...productData,
+			id: productId,
+			listId,
+		};
+
+		// Enfileira a adição do produto e atualização da lista
+		await shoppingListQueue.add(SHOPPING_LIST_JOBS.ADD_PRODUCT, {
+			listId,
+			productData: product,
 		});
 
 		return product;

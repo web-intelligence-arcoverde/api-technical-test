@@ -13,13 +13,25 @@ export class ShoppingListRepository implements IShoppingListRepository {
 		return { ...data, id: docRef.id };
 	}
 
-	async findAllByUserId(userId: string): Promise<IShoppingList[]> {
-		const querySnapshot = await db
+	async findAllByUserId(
+		userId: string,
+		limit?: number,
+		offset?: number,
+	): Promise<IShoppingList[]> {
+		let query = db
 			.collection(this.collectionName)
-			.where("ownerId", "==", userId)
-			.get();
+			.where("ownerId", "==", userId);
 
-		const lists: IShoppingList[] = [];
+		if (limit !== undefined) {
+			query = query.limit(limit);
+		}
+
+		if (offset !== undefined) {
+			query = query.offset(offset);
+		}
+
+		const querySnapshot = await query.get();
+
 		const fetchPromises = querySnapshot.docs.map(async (doc) => {
 			const listData = doc.data() as IShoppingList;
 			const items = await this.getItems(doc.id);

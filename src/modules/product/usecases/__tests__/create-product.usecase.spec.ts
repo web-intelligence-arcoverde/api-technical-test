@@ -2,6 +2,15 @@ import { invalidateCacheByPattern } from "../../../../infra/cache/redis.helper";
 import { ProductRepository } from "../../repositories/product-repository";
 import { CreateProductUseCase } from "../create-product.usecase";
 
+jest.mock("firebase-admin", () => ({
+	auth: jest.fn(),
+	firestore: jest.fn(),
+	credential: {
+		cert: jest.fn(),
+	},
+	initializeApp: jest.fn(),
+	apps: [],
+}));
 jest.mock("../../repositories/product-repository");
 jest.mock("../../../../infra/cache/redis.helper");
 
@@ -20,9 +29,12 @@ describe("CreateProductUseCase", () => {
 		const productData = {
 			name: "Test Product",
 			category: "Test Category",
+			marketName: "Test Market",
+			price: 10.5,
 			quantity: 1,
 			unit: "kg",
 			checked: false,
+			listId: "list-123",
 		};
 
 		const createdProduct = { id: 1, ...productData };
@@ -31,7 +43,9 @@ describe("CreateProductUseCase", () => {
 		const result = await createProductUseCase.execute(productData);
 
 		expect(productRepository.create).toHaveBeenCalledWith(productData);
-		expect(invalidateCacheByPattern).toHaveBeenCalledWith("products:page:*");
+		expect(invalidateCacheByPattern).toHaveBeenCalledWith(
+			`products:page:*:list:${productData.listId}`,
+		);
 		expect(result).toEqual(createdProduct);
 	});
 });

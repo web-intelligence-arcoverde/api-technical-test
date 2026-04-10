@@ -1,6 +1,7 @@
 import { isAxiosError } from "axios";
 import type { NextFunction, Request, Response } from "express";
 import { ZodError } from "zod";
+import logger from "../infra/logger/logger";
 
 interface FirebaseError extends Error {
 	errorInfo?: {
@@ -18,8 +19,10 @@ const errorHandler = (
 	res: Response,
 	_next: NextFunction,
 ): void => {
-	console.error("Error path:", _req.path);
-	console.error("Error details:", err);
+	logger.error(`Error on ${_req.method} ${_req.path}: ${err.message}`, {
+		stack: err.stack,
+		details: err,
+	});
 
 	// 0. Axios / Identity Toolkit REST API Errors
 	if (isAxiosError(err) && err.response?.data?.error) {

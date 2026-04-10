@@ -1,216 +1,85 @@
-# 🚀 API de Lista de Produtos com Node.js, PostgreSQL, Redis e TypeScript
+# 🚀 API de Lista de Compras - Arquitetura Backend Avançada
 
-Este projeto é uma API para gerenciar uma lista de produtos, construída com Node.js, PostgreSQL, Redis e TypeScript. Ele inclui funcionalidades como cache, controle de requisições (rate limiting) e boas práticas para produção.
-
----
-
-## 🧱 Tecnologias Utilizadas
-
-- **Node.js + Express**
-- **PostgreSQL** (SQL puro via `pg`)
-- **Redis** (`ioredis`)
-- **TypeScript**
-- **Rate Limiting** com `rate-limiter-flexible`
-- **Cache** com Redis
-- **Zod** para validação de dados
-- **Docker Compose** para PostgreSQL e Redis
-- **.env** para variáveis de ambiente
+API de Lista de Compras moderna e robusta construída com **Node.js**, **Express**, **Firebase** e **Redis**. Projetada com uma arquitetura modular (Clean Architecture Lite) e um padrão de proxy seguro Backend-for-Frontend (BFF).
 
 ---
 
-## 📦 Instalação
+## 🏗️ Arquitetura & Segurança
+- **Arquitetura Modular em Camadas**: Lógica separada por domínio (Auth, Produto, Lista de Compras) com camadas claramente definidas (Entidades, Casos de Uso, Repositórios).
+- **BFF (Backend-for-Frontend)**: Fluxo de autenticação seguro usando **Cookies HttpOnly**, movendo o gerenciamento de sessão do `localStorage` para mitigar riscos de XSS.
+- **Processamento Assíncrono**: Operações de escrita pesada e inserções em massa gerenciadas pelo **BullMQ** via workers de segundo plano.
+- **Observabilidade**: Logs estruturados de nível empresarial com **Winston**, capturando requisições, latência e stack traces.
 
-### 1. Clonar o repositório e instalar dependências
+## 🛠️ Stack Tecnológica
+- **Core**: Node.js & TypeScript
+- **Banco de Dados**: Firebase Firestore (NoSQL de nível de produção)
+- **Autenticação**: Firebase Auth (Ponte via Proxy)
+- **Cache**: Redis (Cache de alta performance em endpoints de busca)
+- **Fila (Queue)**: BullMQ & IORedis (Jobs confiáveis em segundo plano)
+- **Qualidade**: Biome (Linting/Formatação), Husky & lint-staged (Git Hooks), Jest (Testes)
 
-```bash
-git clone <repo>
-cd <projeto>
-npm install
-cp .env.example .env
+---
+
+## 📦 Instalação & Configuração
+
+### 1. Pré-requisitos
+- Node.js 18+
+- Docker & Docker Compose (para o Redis)
+- Projeto Firebase (JSON do Admin SDK)
+
+### 2. Configuração do Ambiente
+Crie um arquivo `.env` no diretório raiz:
+```env
+NODE_ENV=development
+PORT=3001
+REDIS_URL=redis://localhost:6379
+FIREBASE_API_KEY=sua_chave_api_aqui
 ```
 
-### 2. Configurar o ambiente
-
-Edite o arquivo `.env` com as configurações do banco de dados e Redis.
-
-### 3. Rodar com Docker (PostgreSQL + Redis)
-
+### 3. Executando a Infraestrutura
+Inicie o container do Redis:
 ```bash
 docker-compose up -d
+```
+
+### 4. Executando a Aplicação
+```bash
+npm install     # Instalar dependências
+npm run dev     # Iniciar com auto-reload (ts-node-dev)
 ```
 
 ---
 
 ## 📁 Estrutura do Projeto
-
-```
+O projeto segue uma estrutura modular para melhor manutenibilidade:
+```text
 src/
-├── config/
-│   ├── database.ts         # Configuração do banco de dados PostgreSQL
-│   ├── init-db.ts          # Criação automática da tabela de produtos
-│   └── redis.ts            # Configuração do Redis
-├── controllers/
-│   └── product-controller.ts # Controlador de produtos
-├── middlewares/
-│   ├── error-handle.ts     # Middleware de tratamento de erros
-│   └── rate-limit.ts       # Middleware de rate limiting
-├── repositories/
-│   └── product-repository.ts # Repositório de produtos
-├── routes/
-│   └── product-routes.ts   # Rotas de produtos
-├── use-cases/
-│   ├── create-product-case.ts # Caso de uso para criar produtos
-│   ├── list-product-use-case.ts # Caso de uso para listar produtos
-│   └── change-marke-product-by-id.usecase.ts # Caso de uso para atualizar o campo "checked"
-├── app.ts                  # Configuração principal do app
-└── server.ts               # Inicialização do servidor
+├── config/             # Configurações de infraestrutura (Redis, Firebase)
+├── infra/              # Serviços externos (Firestore, Fila, Logger)
+├── middlewares/        # Middlewares Express (Auth, Cache, Rate-Limit)
+└── modules/            # Lógica de Negócio agrupada por Funcionalidade
+    ├── auth/           # Login seguro, tokens e registro
+    ├── product/        # Definições de itens e processamento em massa
+    └── shopping-list/  # Gerenciamento de listas e compartilhamento
 ```
 
 ---
 
 ## 📖 Documentação da API
+A API está totalmente documentada com **Swagger**.
+Acesse localmente em: `http://localhost:3001/api-docs`
 
-A documentação da API está disponível no formato Swagger. Para acessá-la, inicie o servidor e acesse:http://localhost:3000/api-docs
-
-O Swagger fornece uma interface interativa para explorar e testar os endpoints da API.
-
-## 🧪 Funcionalidades
-
-### ✅ Criar Produto
-
-```http
-POST /product
-Content-Type: application/json
-
-{
-  "category": "Alimentos",
-  "name": "Arroz",
-  "quantity": 2,
-  "unit": "kg",
-  "checked": false
-}
-```
-
-- Grava o produto no banco de dados.
-- Após criação, o cache da listagem é invalidado.
+Documentação detalhada sobre funcionalidades e arquitetura pode ser encontrada em:
+- [Guia de Funcionalidades do Sistema](doc/features.md)
+- [Arquitetura & Diagramas](doc/diagrams/class_diagrams.md)
 
 ---
 
-### ✅ Listar Produtos (com paginação e cache)
-
-```http
-GET /product?page=1&limit=10
-```
-
-- Os resultados são cacheados no Redis por 60 segundos.
-- Reduz chamadas ao banco de dados.
-
----
-
-### ✅ Atualizar o campo "checked" de um Produto
-
-```http
-PATCH /product/:id/checked
-Content-Type: application/json
-
-{
-  "checked": true
-}
-```
-
-- Atualiza o campo `checked` de um produto específico.
-- Após atualização, o cache da listagem é invalidado.
-
----
-
-## 🛡️ Rate Limiting
-
-- Implementado com `rate-limiter-flexible` usando Redis.
-- Limite de 10 requisições por IP a cada 60 segundos.
-- Configurado globalmente ou por rota.
-
----
-
-## 🐘 PostgreSQL – Criação automática da tabela
-
-Na inicialização do projeto, o arquivo `init-db.ts` cria a tabela `products` se ela não existir:
-
-```sql
-CREATE TABLE IF NOT EXISTS products (
-  id SERIAL PRIMARY KEY,
-  category VARCHAR(100) NOT NULL,
-  name VARCHAR(255) NOT NULL,
-  quantity INTEGER NOT NULL,
-  unit VARCHAR(50) NOT NULL,
-  checked BOOLEAN DEFAULT FALSE,
-  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
-```
-
----
-
-## 🐳 Docker Compose
-
-O projeto inclui um arquivo `docker-compose.yml` para configurar PostgreSQL e Redis. Para iniciar os serviços:
-
-```bash
-docker-compose up -d
-```
-
----
-
-## 🧠 Variáveis de Ambiente (.env)
-
-Exemplo de configuração no arquivo `.env`:
-
-```env
-PG_HOST=localhost
-PG_PORT=5432
-PG_USER=postgres
-PG_PASSWORD=root
-PG_DATABASE=shoppingmarketlist
-
-PORT=3000
-
-REDIS_URL=redis://localhost:6379
-```
-
----
-
-## ✅ Como Rodar
-
-### 1. Rodar em desenvolvimento
-
-```bash
-npm run dev
-```
-
-### 2. Compilar para produção
-
-```bash
-npm run build
-```
-
-### 3. Rodar em produção
-
-```bash
-npm start
-```
-
----
-
-## 🧠 Cache com Redis
-
-- Implementado cache no endpoint de listagem de produtos com TTL de 60 segundos.
-- Após criação/atualização de produto, o cache é invalidado com `redis.del`.
-
----
-
-## 🛠️ Testes e Monitoramento
-
-- Estrutura preparada para integração com ferramentas de monitoramento como Grafana e Prometheus.
-- Testes podem ser adicionados com bibliotecas como Jest ou Mocha.
+## 🚀 Principais Funcionalidades
+- **Listas Compartilhadas Públicas**: Acessíveis via endpoints específicos sem autenticação.
+- **Cache Inteligente**: Estratégia automática de HIT/MISS no Redis para reduzir leituras no Firestore.
+- **Ingestão de Dados em Massa**: Processamento em fila para grandes listas de produtos.
+- **Commits Seguros**: Verificações pré-commit automatizadas garantindo que todo o código seja verificado (lint) e testado.
 
 ---
 

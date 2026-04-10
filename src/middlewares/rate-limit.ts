@@ -5,7 +5,7 @@ import redis from "../config/redis";
 const rateLimiter = new RateLimiterRedis({
 	storeClient: redis,
 	keyPrefix: "rateLimiter",
-	points: Number(process.env.RATE_LIMIT_REQUEST) || 10, // número de requisições
+	points: Number(process.env.RATE_LIMIT_REQUEST) || 100, // número de requisições
 	duration: Number(process.env.RATE_LIMIT_DURATION) || 60, // por 60 segundos por IP
 });
 

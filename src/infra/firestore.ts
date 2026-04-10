@@ -1,15 +1,18 @@
 import * as admin from "firebase-admin";
 
-const serviceAccount = require("../../shopping-list-5758e-firebase-adminsdk-fbsvc-334e1a2a4a.json");
+const serviceAccount = {
+	projectId: process.env.FIREBASE_PROJECT_ID,
+	clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
+	privateKey: process.env.FIREBASE_PRIVATE_KEY?.replace(/\\n/g, "\n"),
+};
 
-// apiKey is needed for the Auth REST API (login)
 export const firebaseConfig = {
-	apiKey: "AIzaSyDOlt6FIvBkbxSu5s9199fIiiIgUlq6ObQ",
+	apiKey: process.env.FIREBASE_API_KEY,
 };
 
 if (!admin.apps.length) {
 	admin.initializeApp({
-		credential: admin.credential.cert(serviceAccount),
+		credential: admin.credential.cert(serviceAccount as admin.ServiceAccount),
 	});
 }
 

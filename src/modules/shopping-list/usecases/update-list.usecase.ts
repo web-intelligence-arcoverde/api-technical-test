@@ -1,3 +1,4 @@
+import { invalidateCacheByPattern } from "../../../infra/cache/redis.helper";
 import type { IShoppingList } from "../entities/shopping-list";
 import type { IShoppingListRepository } from "../repositories/shopping-list.repository.interface";
 
@@ -14,5 +15,9 @@ export class UpdateListUseCase {
 			...data,
 			lastModified: new Date(),
 		});
+
+		// Invalida a lista compartilhada e detalhes da lista
+		await invalidateCacheByPattern(`list:detail:${id}:*`);
+		await invalidateCacheByPattern(`list:shared:${id}`);
 	}
 }

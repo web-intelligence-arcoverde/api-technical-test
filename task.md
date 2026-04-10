@@ -1,1 +1,0 @@
-- [x] Update `IProduct` interface in `product.ts` <!-- id: 20 -->
