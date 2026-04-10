@@ -20,18 +20,36 @@ export class ShoppingListRepository implements IShoppingListRepository {
 			.get();
 
 		const lists: IShoppingList[] = [];
-		for (const doc of querySnapshot.docs) {
-			lists.push({ id: doc.id, ...doc.data() } as IShoppingList);
-		}
-		return lists;
+		const fetchPromises = querySnapshot.docs.map(async (doc) => {
+			const listData = doc.data() as IShoppingList;
+			const items = await this.getItems(doc.id);
+			return { id: doc.id, ...listData, items } as IShoppingList;
+		});
+
+		return Promise.all(fetchPromises);
 	}
 
 	async findById(id: string): Promise<IShoppingList | null> {
 		const docSnap = await db.collection(this.collectionName).doc(id).get();
 		if (docSnap.exists) {
-			return { id: docSnap.id, ...docSnap.data() } as IShoppingList;
+			const listData = docSnap.data() as IShoppingList;
+			const items = await this.getItems(id);
+			return { id: docSnap.id, ...listData, items } as IShoppingList;
 		}
 		return null;
+	}
+
+	private async getItems(listId: string) {
+		const itemsSnapshot = await db
+			.collection(this.collectionName)
+			.doc(listId)
+			.collection("items")
+			.get();
+
+		return itemsSnapshot.docs.map((doc) => ({
+			id: doc.id,
+			...doc.data(),
+		}));
 	}
 
 	async update(id: string, data: Partial<IShoppingList>): Promise<void> {
@@ -39,6 +57,19 @@ export class ShoppingListRepository implements IShoppingListRepository {
 	}
 
 	async delete(id: string): Promise<void> {
-		await db.collection(this.collectionName).doc(id).delete();
+		const listRef = db.collection(this.collectionName).doc(id);
+		const itemsSnapshot = await listRef.collection("items").get();
+
+		const batch = db.batch();
+
+		// Deletar todos os itens da subcoleção
+		for (const itemDoc of itemsSnapshot.docs) {
+			batch.delete(itemDoc.ref);
+		}
+
+		// Deletar a lista principal
+		batch.delete(listRef);
+
+		await batch.commit();
 	}
 }

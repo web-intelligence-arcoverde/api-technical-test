@@ -1,8 +1,17 @@
+import type { IProduct } from "../../product/entities/product";
+
 export interface IShoppingList {
 	id?: string;
-	name: string;
+	title: string;
+	description: string;
+	category: string;
+	variant: "primary" | "secondary" | "tertiary";
+	totalItems: number;
+	securedItems: number;
+	items: IProduct[];
 	ownerId: string;
 	sharedWith?: string[];
+	lastModified: Date;
 	createdAt?: Date;
 }
 

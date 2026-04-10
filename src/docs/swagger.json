@@ -163,18 +163,12 @@
 				}
 			}
 		},
-		"/list": {
+		"/shopping-list": {
 			"get": {
 				"tags": ["Listas"],
 				"summary": "Listar listas de compras do usuário",
-				"parameters": [
-					{
-						"name": "userId",
-						"in": "query",
-						"required": true,
-						"schema": { "type": "string" }
-					}
-				],
+				"parameters": [],
+				"security": [{ "BearerAuth": [] }],
 				"responses": {
 					"200": {
 						"description": "Sucesso",
@@ -200,6 +194,7 @@
 						}
 					}
 				},
+				"security": [{ "BearerAuth": [] }],
 				"responses": {
 					"201": {
 						"description": "Lista criada com sucesso",
@@ -209,6 +204,109 @@
 							}
 						}
 					}
+				}
+			}
+		},
+		"/shopping-list/{id}": {
+			"get": {
+				"tags": ["Listas"],
+				"summary": "Obter detalhes de uma lista",
+				"parameters": [
+					{
+						"name": "id",
+						"in": "path",
+						"required": true,
+						"schema": { "type": "string" }
+					}
+				],
+				"security": [{ "BearerAuth": [] }],
+				"responses": {
+					"200": {
+						"description": "Sucesso",
+						"content": {
+							"application/json": {
+								"schema": { "$ref": "#/components/schemas/ShoppingList" }
+							}
+						}
+					},
+					"404": { "description": "Lista não encontrada" }
+				}
+			},
+			"patch": {
+				"tags": ["Listas"],
+				"summary": "Atualizar lista",
+				"parameters": [
+					{
+						"name": "id",
+						"in": "path",
+						"required": true,
+						"schema": { "type": "string" }
+					}
+				],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": { "$ref": "#/components/schemas/UpdateListRequest" }
+						}
+					}
+				},
+				"security": [{ "BearerAuth": [] }],
+				"responses": {
+					"200": { "description": "Lista atualizada com sucesso" },
+					"404": { "description": "Lista não encontrada" }
+				}
+			},
+			"delete": {
+				"tags": ["Listas"],
+				"summary": "Excluir lista",
+				"parameters": [
+					{
+						"name": "id",
+						"in": "path",
+						"required": true,
+						"schema": { "type": "string" }
+					}
+				],
+				"security": [{ "BearerAuth": [] }],
+				"responses": {
+					"200": { "description": "Lista deletada com sucesso" },
+					"404": { "description": "Lista não encontrada" }
+				}
+			}
+		},
+		"/shopping-list/{id}/product": {
+			"post": {
+				"tags": ["Listas"],
+				"summary": "Adicionar produto a uma lista específica",
+				"parameters": [
+					{
+						"name": "id",
+						"in": "path",
+						"required": true,
+						"schema": { "type": "string" }
+					}
+				],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": { "$ref": "#/components/schemas/AddProductRequest" }
+						}
+					}
+				},
+				"security": [{ "BearerAuth": [] }],
+				"responses": {
+					"201": {
+						"description": "Produto adicionado",
+						"content": {
+							"application/json": {
+								"schema": { "$ref": "#/components/schemas/Product" }
+							}
+						}
+					},
+					"403": { "description": "Sem permissão para alterar esta lista" },
+					"404": { "description": "Lista não encontrada" }
 				}
 			}
 		},
@@ -234,6 +332,7 @@
 						"schema": { "type": "integer", "default": 10 }
 					}
 				],
+				"security": [{ "BearerAuth": [] }],
 				"responses": {
 					"200": {
 						"description": "Sucesso",
@@ -266,6 +365,7 @@
 						}
 					}
 				},
+				"security": [{ "BearerAuth": [] }],
 				"responses": {
 					"201": {
 						"description": "Produto adicionado",
@@ -310,6 +410,7 @@
 						}
 					}
 				},
+				"security": [{ "BearerAuth": [] }],
 				"responses": {
 					"200": { "description": "Atualizado com sucesso" }
 				}
@@ -333,6 +434,7 @@
 						"schema": { "type": "string" }
 					}
 				],
+				"security": [{ "BearerAuth": [] }],
 				"responses": {
 					"200": { "description": "Removido com sucesso" }
 				}
@@ -340,6 +442,13 @@
 		}
 	},
 	"components": {
+		"securitySchemes": {
+			"BearerAuth": {
+				"type": "http",
+				"scheme": "bearer",
+				"bearerFormat": "JWT"
+			}
+		},
 		"schemas": {
 			"LoginRequest": {
 				"type": "object",
@@ -379,18 +488,60 @@
 				"type": "object",
 				"properties": {
 					"id": { "type": "string" },
-					"name": { "type": "string" },
-					"userId": { "type": "string" },
+					"title": { "type": "string" },
+					"description": { "type": "string" },
+					"category": { "type": "string" },
+					"variant": {
+						"type": "string",
+						"enum": ["primary", "secondary", "tertiary"]
+					},
+					"totalItems": { "type": "integer" },
+					"securedItems": { "type": "integer" },
+					"items": {
+						"type": "array",
+						"items": { "$ref": "#/components/schemas/Product" }
+					},
+					"ownerId": { "type": "string" },
+					"lastModified": { "type": "string", "format": "date-time" },
 					"createdAt": { "type": "string", "format": "date-time" }
 				}
 			},
 			"CreateListRequest": {
 				"type": "object",
 				"properties": {
-					"name": { "type": "string" },
-					"userId": { "type": "string" }
+					"title": { "type": "string" },
+					"description": { "type": "string" },
+					"category": { "type": "string" },
+					"variant": {
+						"type": "string",
+						"enum": ["primary", "secondary", "tertiary"]
+					},
+					"totalItems": { "type": "integer" },
+					"securedItems": { "type": "integer" },
+					"items": {
+						"type": "array",
+						"items": { "$ref": "#/components/schemas/Product" }
+					}
 				},
-				"required": ["name", "userId"]
+				"required": ["title", "category", "variant"]
+			},
+			"UpdateListRequest": {
+				"type": "object",
+				"properties": {
+					"title": { "type": "string" },
+					"description": { "type": "string" },
+					"category": { "type": "string" },
+					"variant": {
+						"type": "string",
+						"enum": ["primary", "secondary", "tertiary"]
+					},
+					"totalItems": { "type": "integer" },
+					"securedItems": { "type": "integer" },
+					"items": {
+						"type": "array",
+						"items": { "$ref": "#/components/schemas/Product" }
+					}
+				}
 			},
 			"Product": {
 				"type": "object",
@@ -398,6 +549,8 @@
 					"id": { "type": "string" },
 					"listId": { "type": "string" },
 					"name": { "type": "string" },
+					"marketName": { "type": "string" },
+					"price": { "type": "number" },
 					"category": { "type": "string" },
 					"quantity": { "type": "integer" },
 					"unit": { "type": "string" },
@@ -409,12 +562,27 @@
 				"properties": {
 					"listId": { "type": "string" },
 					"name": { "type": "string" },
+					"marketName": { "type": "string" },
+					"price": { "type": "number" },
 					"category": { "type": "string" },
 					"quantity": { "type": "integer" },
 					"unit": { "type": "string" },
 					"checked": { "type": "boolean" }
 				},
-				"required": ["listId", "name", "category", "quantity", "unit"]
+				"required": ["listId", "name", "marketName", "price", "category", "quantity", "unit"]
+			},
+			"AddProductRequest": {
+				"type": "object",
+				"properties": {
+					"category": { "type": "string" },
+					"name": { "type": "string" },
+					"marketName": { "type": "string" },
+					"price": { "type": "number" },
+					"quantity": { "type": "integer" },
+					"unit": { "type": "string" },
+					"checked": { "type": "boolean" }
+				},
+				"required": ["category", "name", "marketName", "price", "quantity", "unit"]
 			}
 		}
 	}

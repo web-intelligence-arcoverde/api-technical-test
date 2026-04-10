@@ -9,6 +9,7 @@ import { limiter } from "./middlewares/rate-limit-express";
 import authRoutes from "./modules/auth/routes";
 import productRoutes from "./modules/product/routes";
 import shoppingListRoutes from "./modules/shopping-list/routes";
+import { authMiddleware } from "./middlewares/auth.middleware";
 
 dotenv.config();
 
@@ -29,8 +30,8 @@ app.use(limiter);
 app.use(rateLimiterMiddleware);
 
 app.use("/auth", authRoutes);
-app.use("/list", shoppingListRoutes);
-app.use("/product", productRoutes);
+app.use("/shopping-list", authMiddleware, shoppingListRoutes);
+app.use("/product", authMiddleware, productRoutes);
 app.use(errorHandler);
 
 export default app;

@@ -1,1 +1,1 @@
-https://chatgpt.com/c/680ab823-8ca4-800a-8f94-83d2602da2fa
+- [x] Update `IProduct` interface in `product.ts` <!-- id: 20 -->

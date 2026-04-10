@@ -11,7 +11,7 @@ export class ToggleCheckedProductController implements IController {
 		try {
 			const validated = toggleCheckedProductValidation.parse({
 				id: req.params.id,
-				listId: req.query.listId,
+				listId: req.body.listId,
 				checked: req.body.checked,
 			});
 

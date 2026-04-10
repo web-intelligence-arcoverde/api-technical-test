@@ -11,12 +11,12 @@ const itemSchema = z.object({
 	checked: z.boolean().optional().default(false),
 });
 
-export const createListSchema = z.object({
-	title: z.string().min(1, "O título é obrigatório."),
-	description: z.string().optional().default(""),
-	category: z.string().min(1, "A categoria é obrigatória."),
-	variant: z.enum(["primary", "secondary", "tertiary"]).default("primary"),
-	totalItems: z.number().optional().default(0),
-	securedItems: z.number().optional().default(0),
-	items: z.array(itemSchema).optional().default([]),
+export const updateListSchema = z.object({
+	title: z.string().optional(),
+	description: z.string().optional(),
+	category: z.string().optional(),
+	variant: z.enum(["primary", "secondary", "tertiary"]).optional(),
+	totalItems: z.number().optional(),
+	securedItems: z.number().optional(),
+	items: z.array(itemSchema).optional(),
 });
