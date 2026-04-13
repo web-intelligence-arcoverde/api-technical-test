@@ -6,11 +6,19 @@ export class ShoppingListRepository implements IShoppingListRepository {
 	private readonly collectionName = "lists";
 
 	async create(data: IShoppingList): Promise<IShoppingList> {
-		const docRef = await db.collection(this.collectionName).add({
+		const listRef = data.id
+			? db.collection(this.collectionName).doc(data.id)
+			: db.collection(this.collectionName).doc();
+
+		const id = listRef.id;
+
+		await listRef.set({
 			...data,
+			id,
 			createdAt: new Date(),
 		});
-		return { ...data, id: docRef.id };
+
+		return { ...data, id };
 	}
 
 	async findAllByUserId(
@@ -42,19 +50,26 @@ export class ShoppingListRepository implements IShoppingListRepository {
 	}
 
 	async findById(id: string): Promise<IShoppingList | null> {
-		const docSnap = await db.collection(this.collectionName).doc(id).get();
+		const trimmedId = id.trim();
+		const docSnap = await db
+			.collection(this.collectionName)
+			.doc(trimmedId)
+			.get();
+
 		if (docSnap.exists) {
 			const listData = docSnap.data() as IShoppingList;
-			const items = await this.getItems(id);
+			const items = await this.getItems(trimmedId);
 			return { id: docSnap.id, ...listData, items } as IShoppingList;
 		}
+
 		return null;
 	}
 
 	private async getItems(listId: string) {
+		const trimmedId = listId.trim();
 		const itemsSnapshot = await db
 			.collection(this.collectionName)
-			.doc(listId)
+			.doc(trimmedId)
 			.collection("items")
 			.get();
 

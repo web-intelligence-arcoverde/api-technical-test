@@ -6,7 +6,6 @@ const publicRouter = Router();
 const privateRouter = Router();
 const listController = makeShoppingListController();
 
-// Prioridade Máxima: Lista Pública (TTL 5 min - 300s)
 publicRouter.get(
 	"/:id",
 	cacheMiddleware((req) => `list:shared:${req.params.id}`, 300),
@@ -15,7 +14,6 @@ publicRouter.get(
 
 privateRouter.post("/", listController.create);
 
-// Prioridade Máxima: Listagem do Usuário (TTL 10 min - 600s)
 privateRouter.get(
 	"/",
 	cacheMiddleware(
@@ -26,7 +24,6 @@ privateRouter.get(
 	listController.list,
 );
 
-// Prioridade Média: Detalhes da Lista (TTL 5 min - 300s)
 privateRouter.get(
 	"/:id",
 	cacheMiddleware(

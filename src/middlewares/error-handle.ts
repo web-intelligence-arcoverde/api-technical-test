@@ -19,10 +19,14 @@ const errorHandler = (
 	res: Response,
 	_next: NextFunction,
 ): void => {
-	logger.error(`Error on ${_req.method} ${_req.path}: ${err.message}`, {
-		stack: err.stack,
-		details: err,
-	});
+	if (err.message === "Lista não encontrada") {
+		logger.warn(`Not Found: ${_req.method} ${_req.path}: ${err.message}`);
+	} else {
+		logger.error(`Error on ${_req.method} ${_req.path}: ${err.message}`, {
+			stack: err.stack,
+			details: err,
+		});
+	}
 
 	// 0. Axios / Identity Toolkit REST API Errors
 	if (isAxiosError(err) && err.response?.data?.error) {
@@ -120,8 +124,16 @@ const errorHandler = (
 	}
 
 	// Default: Internal Server Error
-	res.status(500).json({
-		error: "Internal Server Error",
+	let status = 500;
+	let errorType = "Internal Server Error";
+
+	if (err.message === "Lista não encontrada") {
+		status = 404;
+		errorType = "Not Found";
+	}
+
+	res.status(status).json({
+		error: errorType,
 		message: err.message || "An unexpected error occurred",
 	});
 };

@@ -34,8 +34,18 @@ export class ProductRepository implements IProductRepository {
 	}
 
 	async create(data: IProduct): Promise<IProduct> {
-		const docRef = await this.getCollection(data.listId).add(data);
-		return { ...data, id: docRef.id };
+		const itemRef = data.id
+			? this.getCollection(data.listId).doc(String(data.id))
+			: this.getCollection(data.listId).doc();
+
+		const id = itemRef.id;
+
+		await itemRef.set({
+			...data,
+			id,
+		});
+
+		return { ...data, id };
 	}
 
 	async findById(id: string, listId: string): Promise<IProduct | null> {

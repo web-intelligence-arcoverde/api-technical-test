@@ -1,4 +1,5 @@
 import type { Request, RequestHandler } from "express";
+import logger from "../../../infra/logger/logger";
 import type { AddProductToListUseCase } from "../usecases/add-product-to-list.usecase";
 import type { CreateListUseCase } from "../usecases/create-list.usecase";
 import type { DeleteListUseCase } from "../usecases/delete-list.usecase";
@@ -55,6 +56,9 @@ export class ShoppingListController {
 	getById: RequestHandler = async (req, res, next) => {
 		try {
 			const { id } = req.params;
+
+			logger.info(`[ShoppingListController] Fetching list by ID: "${id}"`);
+
 			const result = await this.getListUseCase.execute(id);
 			res.status(200).json(result);
 		} catch (error) {
