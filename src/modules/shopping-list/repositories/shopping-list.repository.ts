@@ -3,7 +3,7 @@ import type { IShoppingList } from "../entities/shopping-list";
 import type { IShoppingListRepository } from "./shopping-list.repository.interface";
 
 export class ShoppingListRepository implements IShoppingListRepository {
-	private readonly collectionName = "lists";
+	private readonly collectionName = "shopping-lists";
 
 	async create(data: IShoppingList): Promise<IShoppingList> {
 		const listRef = data.id

@@ -31,6 +31,7 @@ export const shoppingListProcessor = async (job: Job) => {
 					securedItems: data.securedItems || 0,
 					items: (data.items || []) as IProduct[],
 					ownerId: data.userId,
+					shared: data.shared || false,
 					lastModified: new Date(),
 				});
 

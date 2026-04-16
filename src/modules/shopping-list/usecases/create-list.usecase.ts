@@ -15,11 +15,12 @@ export interface CreateListDTO {
 	securedItems?: number;
 	items?: (Omit<IProduct, "listId"> & { listId?: string })[];
 	userId: string;
+	shared?: boolean;
 }
 
 export class CreateListUseCase {
 	async execute(data: CreateListDTO): Promise<IShoppingList> {
-		const id = db.collection("lists").doc().id;
+		const id = db.collection("shopping-lists").doc().id;
 
 		const newList: IShoppingList = {
 			id,
@@ -34,6 +35,7 @@ export class CreateListUseCase {
 				listId: id,
 			})) as IProduct[],
 			ownerId: data.userId,
+			shared: data.shared || false,
 			lastModified: new Date(),
 		};
 

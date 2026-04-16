@@ -6,14 +6,15 @@ import type { IAuthRepository, IAuthUser } from "./auth.repository.interface";
 export type { IAuthRepository };
 
 export class AuthRepository implements IAuthRepository {
+	private readonly collectionName = "users";
+
 	async register(
 		email: string,
 		password: string,
 		name: string,
 	): Promise<IAuthUser> {
-		// 1. Check if user already exists in Firestore (integrity check)
 		const userSnapshot = await db
-			.collection("users")
+			.collection(this.collectionName)
 			.where("email", "==", email)
 			.get();
 
@@ -37,7 +38,7 @@ export class AuthRepository implements IAuthRepository {
 			displayName: name,
 		});
 
-		await db.collection("users").doc(userRecord.uid).set({
+		await db.collection(this.collectionName).doc(userRecord.uid).set({
 			uid: userRecord.uid,
 			email: userRecord.email,
 			name: name,
@@ -89,17 +90,12 @@ export class AuthRepository implements IAuthRepository {
 	}
 
 	async logout(): Promise<void> {
-		// Admin SDK doesn't have a "sign out" session on the server.
-		// In a backend API, logout is usually handled by the client discarding the token.
-		// We could revoke tokens here if we implemented a session store.
 		return;
 	}
 
 	async resetPassword(email: string): Promise<void> {
 		const link = await auth.generatePasswordResetLink(email);
-		// Note: Usually you'd send this link via email.
-		// Firebase Client SDK has sendPasswordResetEmail which does both.
-		// Admin SDK only generates the link. For now we just generate it.
+
 		logger.info(`Password reset link generated for ${email}: ${link}`);
 	}
 
@@ -107,24 +103,21 @@ export class AuthRepository implements IAuthRepository {
 		uid: string,
 		data: { name?: string; email?: string },
 	): Promise<void> {
-		// 1. Update Firebase Auth
 		await auth.updateUser(uid, {
 			displayName: data.name,
 			email: data.email,
 		});
 
-		// 2. Update Firestore document
 		const updateData: Record<string, string> = {};
 		if (data.name) updateData.name = data.name;
 		if (data.email) updateData.email = data.email;
 
-		await db.collection("users").doc(uid).update(updateData);
+		await db.collection(this.collectionName).doc(uid).update(updateData);
 	}
 
 	async delete(uid: string): Promise<void> {
-		// 1. Cascading deletion: Delete all lists and their product items
 		const listsSnapshot = await db
-			.collection("lists")
+			.collection("shopping-lists")
 			.where("ownerId", "==", uid)
 			.get();
 
@@ -135,16 +128,12 @@ export class AuthRepository implements IAuthRepository {
 			}
 			await listDoc.ref.delete();
 		}
-
-		// 2. Delete Firestore user document
-		await db.collection("users").doc(uid).delete();
-
-		// 3. Delete from Firebase Auth
+		await db.collection(this.collectionName).doc(uid).delete();
 		await auth.deleteUser(uid);
 	}
 
 	async findAll(): Promise<Omit<IAuthUser, "token" | "refreshToken">[]> {
-		const snapshot = await db.collection("users").get();
+		const snapshot = await db.collection(this.collectionName).get();
 		const users: Omit<IAuthUser, "token" | "refreshToken">[] = [];
 
 		for (const doc of snapshot.docs) {

@@ -5,7 +5,7 @@ import type { IProductRepository } from "./product-repository.interface";
 
 export class ProductRepository implements IProductRepository {
 	private getCollection(listId: string) {
-		return db.collection("lists").doc(listId).collection("items");
+		return db.collection("shopping-lists").doc(listId).collection("items");
 	}
 
 	async findAll(

@@ -10,6 +10,7 @@ export interface IShoppingList {
 	securedItems: number;
 	items: IProduct[];
 	ownerId: string;
+	shared: boolean;
 	sharedWith?: string[];
 	lastModified: Date;
 	createdAt?: Date;

@@ -19,4 +19,5 @@ export const updateListSchema = z.object({
 	totalItems: z.number().optional(),
 	securedItems: z.number().optional(),
 	items: z.array(itemSchema).optional(),
+	shared: z.boolean().optional(),
 });

@@ -19,4 +19,5 @@ export const createListSchema = z.object({
 	totalItems: z.number().optional().default(0),
 	securedItems: z.number().optional().default(0),
 	items: z.array(itemSchema).optional().default([]),
+	shared: z.boolean().optional().default(false),
 });

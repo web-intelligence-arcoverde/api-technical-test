@@ -18,7 +18,10 @@ export const bulkInsertProcessor = async (job: Job<BulkInsertData>) => {
 		`[Queue] Processing job ${job.id}: inserting ${items.length} items in list ${listId}`,
 	);
 
-	const collectionRef = db.collection("lists").doc(listId).collection("items");
+	const collectionRef = db
+		.collection("shopping-lists")
+		.doc(listId)
+		.collection("items");
 
 	// O Firestore permite no máximo 500 operações por batch
 	const CHUNK_SIZE = 500;
@@ -38,7 +41,7 @@ export const bulkInsertProcessor = async (job: Job<BulkInsertData>) => {
 
 	// Atualiza o contador de itens totais na lista pai
 	await db
-		.collection("lists")
+		.collection("shopping-lists")
 		.doc(listId)
 		.update({
 			// biome-ignore lint/suspicious/noExplicitAny: Atomic increment
