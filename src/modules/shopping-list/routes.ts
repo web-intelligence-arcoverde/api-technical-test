@@ -35,7 +35,6 @@ privateRouter.get(
 
 privateRouter.patch("/:id", listController.update);
 privateRouter.delete("/:id", listController.delete);
-privateRouter.post("/:id/product", listController.addProduct);
 
 export { publicRouter as sharedShoppingListRouter };
 export default privateRouter;

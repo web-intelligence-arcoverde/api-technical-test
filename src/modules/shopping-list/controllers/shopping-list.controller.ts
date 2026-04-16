@@ -1,12 +1,11 @@
 import type { Request, RequestHandler } from "express";
 import logger from "../../../infra/logger/logger";
-import type { AddProductToListUseCase } from "../usecases/add-product-to-list.usecase";
+
 import type { CreateListUseCase } from "../usecases/create-list.usecase";
 import type { DeleteListUseCase } from "../usecases/delete-list.usecase";
 import type { GetListUseCase } from "../usecases/get-list.usecase";
 import type { ListListsUseCase } from "../usecases/list-lists.usecase";
 import type { UpdateListUseCase } from "../usecases/update-list.usecase";
-import { addProductSchema } from "../validations/add-product.schema";
 import { createListSchema } from "../validations/create-list.schema";
 import { updateListSchema } from "../validations/update-list.schema";
 
@@ -24,7 +23,6 @@ export class ShoppingListController {
 		private readonly getListUseCase: GetListUseCase,
 		private readonly updateListUseCase: UpdateListUseCase,
 		private readonly deleteListUseCase: DeleteListUseCase,
-		private readonly addProductToListUseCase: AddProductToListUseCase,
 	) {}
 
 	create: RequestHandler = async (req, res, next) => {
@@ -82,23 +80,6 @@ export class ShoppingListController {
 			const { id } = req.params;
 			await this.deleteListUseCase.execute(id);
 			res.status(200).json({ message: "Lista deletada com sucesso" });
-		} catch (error) {
-			next(error);
-		}
-	};
-
-	addProduct: RequestHandler = async (req, res, next) => {
-		try {
-			const { id } = req.params;
-			const userId = (req as unknown as AuthenticatedRequest).user.uid;
-			const data = addProductSchema.parse(req.body);
-			const result = await this.addProductToListUseCase.execute(
-				id,
-				userId,
-				// biome-ignore lint/suspicious/noExplicitAny: Product data is validated by schema
-				data as any,
-			);
-			res.status(201).json(result);
 		} catch (error) {
 			next(error);
 		}

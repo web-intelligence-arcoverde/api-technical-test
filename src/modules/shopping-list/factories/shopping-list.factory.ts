@@ -1,6 +1,5 @@
 import { ShoppingListController } from "../controllers/shopping-list.controller";
 import { ShoppingListRepository } from "../repositories/shopping-list.repository";
-import { AddProductToListUseCase } from "../usecases/add-product-to-list.usecase";
 import { CreateListUseCase } from "../usecases/create-list.usecase";
 import { DeleteListUseCase } from "../usecases/delete-list.usecase";
 import { GetListUseCase } from "../usecases/get-list.usecase";
@@ -14,7 +13,6 @@ export const makeShoppingListController = (): ShoppingListController => {
 	const getListUseCase = new GetListUseCase(listRepository);
 	const updateListUseCase = new UpdateListUseCase(listRepository);
 	const deleteListUseCase = new DeleteListUseCase(listRepository);
-	const addProductToListUseCase = new AddProductToListUseCase(listRepository);
 
 	return new ShoppingListController(
 		createListUseCase,
@@ -22,6 +20,5 @@ export const makeShoppingListController = (): ShoppingListController => {
 		getListUseCase,
 		updateListUseCase,
 		deleteListUseCase,
-		addProductToListUseCase,
 	);
 };
