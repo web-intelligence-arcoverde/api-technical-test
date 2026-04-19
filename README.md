@@ -5,7 +5,7 @@ API de Lista de Compras moderna e robusta construída com **Node.js**, **Express
 ---
 
 ## 🏗️ Arquitetura & Segurança
-- **Arquitetura Modular em Camadas**: Lógica separada por domínio (Auth, Produto, Lista de Compras) com camadas claramente definidas (Entidades, Casos de Uso, Repositórios).
+- **Arquitetura Modular em Camadas**: Lógica separada por domínio (Auth, Produto, Lista de Compras) com camadas claramente definidas (Entidades, Casos de Uso, Repositórios). Itens de produtos são gerenciados em uma coleção global para melhor performance e escalabilidade.
 - **BFF (Backend-for-Frontend)**: Fluxo de autenticação seguro usando **Cookies HttpOnly**, movendo o gerenciamento de sessão do `localStorage` para mitigar riscos de XSS.
 - **Processamento Assíncrono**: Operações de escrita pesada e inserções em massa gerenciadas pelo **BullMQ** via workers de segundo plano.
 - **Observabilidade**: Logs estruturados de nível empresarial com **Winston**, capturando requisições, latência e stack traces.
@@ -24,8 +24,9 @@ API de Lista de Compras moderna e robusta construída com **Node.js**, **Express
 
 A API foi submetida a testes de carga rigorosos para garantir estabilidade sob alta demanda:
 
-- **Shopping List (Leitura)**: Alcançou **~650 RPS** com latência sub-20ms.
-- **Shopping List (Escrita)**: Alcançou **~1.000 RPS** utilizando a estratégia de "Fire-and-Forget" com processamento assíncrono via BullMQ.
+- **Shopping List (Leitura)**: Alcançou **~1.500 RPS** com latência média de 6ms (com Cache Redis).
+- **Shopping List (Escrita)**: Alcançou **~1.100 RPS** utilizando a estratégia de "Fire-and-Forget" com processamento assíncrono via BullMQ.
+- **Autenticação (Auth)**: Alcançou **~3.300 RPS** em fluxos de login e registro.
 - **Bypass de Teste**: Suporta o header `x-load-test-bypass: true` para facilitar benchmarks sem interferência do Rate Limiter.
 
 ---
@@ -97,6 +98,7 @@ src/
 Documentação detalhada sobre as regras de negócio e diagramas:
 - [Guia de Funcionalidades do Sistema](doc/features.md)
 - [Arquitetura & Diagramas](doc/diagrams/class_diagrams.md)
+- [Relatório de Evidências de Testes (Unitários & Carga)](doc/tests_evidence.md)
 
 ---
 

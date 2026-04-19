@@ -6,4 +6,4 @@ Modifica as propriedades básicas de uma lista de compras.
     2. Atualiza os campos (título, descrição, categoria, variante) no Firestore.
     3. Invalida os caches de listagem e detalhes daquela lista.
 - **Retorno**: Objeto da lista atualizada.
-- **router**: PATCH `/api/shopping-list/:id`
+- **router**: PATCH `/shopping-list/:id`

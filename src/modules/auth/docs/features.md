@@ -1,8 +1,8 @@
-# Auth Module Documentation
+# Documentação do Módulo de Autenticação
 
 O módulo de autenticação é responsável por gerenciar o ciclo de vida dos usuários e a segurança da aplicação, utilizando o Firebase Admin SDK para autenticação e gestão de identidade.
 
-## Funcionalidades (Features)
+## Funcionalidades
 
 ### 1. Registro de Usuários (`RegisterUserUseCase`)
 Permite a criação de novos usuários no sistema.

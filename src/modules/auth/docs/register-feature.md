@@ -7,4 +7,4 @@ Permite a criação de novos usuários no sistema e a persistência de seus dado
     3. Cria o documento do usuário no Firestore (coleção `users`).
     4. Realiza o login automático para retornar os tokens iniciais.
 - **Retorno**: Objeto contendo `uid`, `email`, `name`, `token` (Access Token) e `refreshToken`.
-- **router**: POST `/api/auth/register`
+- **router**: POST `/auth/register`

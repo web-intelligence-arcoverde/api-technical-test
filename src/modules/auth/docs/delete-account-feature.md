@@ -6,4 +6,4 @@ Remove permanentemente um usuário e todos os seus dados associados do sistema.
     2. Remove o documento do usuário da coleção `users`.
     3. Remove o usuário do Firebase Authentication.
 - **Retorno**: Nenhum (Sucesso com Status 204).
-- **router**: DELETE `/api/auth/account/:uid`
+- **router**: DELETE `/auth/account/:uid`

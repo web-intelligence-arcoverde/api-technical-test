@@ -1,8 +1,8 @@
-# Product Module Documentation
+# Documentação do Módulo de Produtos
 
 O módulo de produtos gerencia o catálogo de itens que podem ser adicionados às listas de compras. Ele lida com a persistência no Firestore e operações em lote.
 
-## Funcionalidades (Features)
+## Funcionalidades
 
 ### 1. Criação de Produto (`CreateProductUseCase`)
 Permite adicionar um novo produto individual ao catálogo global.

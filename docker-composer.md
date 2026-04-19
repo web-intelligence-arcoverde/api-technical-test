@@ -10,118 +10,80 @@ Define a versão do Docker Compose. A versão `3.8` é amplamente compatível co
 
 ## Services (Serviços)
 
-### 1. `postgres`
-
-```yaml
-postgres:
-  image: postgres:15
-```
-
-Usa a imagem oficial do PostgreSQL versão 15.
-
-```yaml
-container_name: node_boilerplate_postgres
-```
-
-Nome do container.
-
-```yaml
-environment:
-  POSTGRES_USER: postgres
-  POSTGRES_PASSWORD: postgres
-  POSTGRES_DB: node_app
-```
-
-Define usuário, senha e nome do banco de dados.
-
-```yaml
-ports:
-  - '5432:5432'
-```
-
-Mapeia a porta 5432 do container para a 5432 da máquina host.
-
-```yaml
-volumes:
-  - pgdata:/var/lib/postgresql/data
-```
-
-Cria um volume persistente para armazenar os dados do banco.
-
-```yaml
-networks:
-  - app-network
-```
-
-Coloca o container na rede interna `app-network`.
-
----
-
-### 2. `redis`
+### 1. `redis`
 
 ```yaml
 redis:
   image: redis:7
 ```
 
-Imagem oficial do Redis versão 7.
+Usa a imagem oficial do Redis versão 7.
 
 ```yaml
 container_name: node_boilerplate_redis
+```
+
+Nome do container para facilitar a identificação.
+
+```yaml
 ports:
   - '6379:6379'
 ```
 
-Mapeia a porta padrão do Redis.
+Mapeia a porta padrão do Redis (6379) do container para a máquina host.
 
 ```yaml
 networks:
   - app-network
 ```
 
-Conecta ao mesmo network dos demais containers.
+Conecta o Redis à rede interna `app-network`.
 
 ---
 
-### 3. `app`
+### 2. `app`
 
 ```yaml
 app:
   build: .
 ```
 
-Constrói a imagem usando o `Dockerfile` na raiz.
+Constrói a imagem da aplicação usando o `Dockerfile` presente na raiz do projeto.
 
 ```yaml
 container_name: node_boilerplate_app
+```
+
+Nome do container da aplicação.
+
+```yaml
 ports:
   - '3000:3000'
 ```
 
-Expõe a aplicação na porta 3000.
+Expõe a aplicação na porta 3000 (mapeada da porta interna do container).
 
 ```yaml
 environment:
-  DATABASE_URL: postgres://postgres:postgres@postgres:5432/node_app
   REDIS_URL: redis://redis:6379
+  FIREBASE_API_KEY: ${FIREBASE_API_KEY}
 ```
 
-Passa as variáveis de ambiente para conectar com PostgreSQL e Redis.
+Passa as variáveis de ambiente necessárias. O `REDIS_URL` aponta para o nome do serviço `redis` na rede interna do Docker.
 
 ```yaml
 depends_on:
-  - postgres
   - redis
 ```
 
-Garante que PostgreSQL e Redis iniciem antes da aplicação.
+Garante que o container do Redis seja iniciado antes da aplicação.
 
 ```yaml
 networks:
   - app-network
 ```
 
-Conecta à mesma rede dos bancos.
+Conecta à mesma rede do Redis para permitir a comunicação.
 
 ```yaml
 volumes:
@@ -129,24 +91,13 @@ volumes:
   - /app/node_modules
 ```
 
-Sincroniza os arquivos locais com o container.
+Mapeia o diretório atual para `/app` dentro do container, permitindo o desenvolvimento com "hot reload". O volume `/app/node_modules` garante que as dependências do container não sejam sobrescritas pelas locais.
 
 ```yaml
 command: npm run dev
 ```
 
-Comando para iniciar a aplicação em modo desenvolvimento.
-
----
-
-## Volumes
-
-```yaml
-volumes:
-  pgdata:
-```
-
-Volume nomeado para armazenar os dados do PostgreSQL.
+Comando padrão para iniciar a aplicação em modo de desenvolvimento.
 
 ---
 
@@ -158,4 +109,4 @@ networks:
     driver: bridge
 ```
 
-Cria uma rede isolada onde os containers se comunicam entre si pelo nome do serviço (por ex: `postgres`, `redis`).
+Cria uma rede isolada do tipo `bridge` onde os containers podem se comunicar entre si utilizando os nomes dos serviços como hostnames (ex: a aplicação acessa o Redis via `redis:6379`).
