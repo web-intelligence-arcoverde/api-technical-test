@@ -12,6 +12,7 @@
 		"test": "jest",
 		"test:load": "npx ts-node src/modules/auth/__tests__/load/auth.load.test.ts",
 		"test:load:list": "npx ts-node src/modules/shopping-list/__tests__/load/shopping-list.load.test.ts",
+		"test:load:product": "npx ts-node src/modules/product/__tests__/load/product.load.test.ts",
 		"prepare": "husky"
 	},
 	"keywords": [],
